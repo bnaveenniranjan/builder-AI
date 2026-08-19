@@ -1,8 +1,8 @@
 // this page will redirect the user to login pages ,
 //  if new user push sign up pages
 
-import { createContext, useContext } from "react";
-
+import { createContext, useContext, useEffect, useState } from "react";
+import api from "../api/api";
 
 const AppContext =  createContext(undefined);
 
@@ -12,6 +12,21 @@ export function AppContentProvider({children}){
     const [user,setUser] = useState(null)
     const [loadingUser, setLoading] = useState(true);
 
+    // Auth Actions
+    const checkSession = async ()=>{
+        try{
+            const {data} = await api.get("/api/auth/me");
+          //  setUser(data.user);
+        }catch (error){
+            setUser(null)
+        }finally{
+            setLoading(false)
+        }
+    }
+    useEffect(()=>{
+        checkSession()
+
+    },[checkSession])
 
     return(
         <AppContext.Provider value={{
