@@ -3,8 +3,9 @@ import {Route,Routes} from 'react-router-dom'
 import {AuthLayout, GuestLayout} from './pages/Layout'
 import AuthPage from './pages/AuthPage'
 import Homepages from './pages/Homepages'
-import BuilderPage from'./pages/Builder.page'
-import previewPage from './pages/PreviewPage'
+import BuilderPage from'./pages/Builderpage'
+import PreviewPage from './pages/PreviewPage'
+
 
 const App = () => {
   return(
@@ -19,7 +20,7 @@ const App = () => {
       <Route element={<AuthLayout/>}>
        <Route path='/' element={<Homepages/>}/>
        <Route path='/builder/:id' element={<BuilderPage />}/>
-       <Route path='/preview/:id' element={<previewPage/>}/>
+       <Route path='/preview/:id' element={<PreviewPage/>}/>
       </Route>
       
     </Routes>
