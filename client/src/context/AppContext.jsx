@@ -16,7 +16,7 @@ export function AppContentProvider({children}){
     const checkSession = async ()=>{
         try{
             const {data} = await api.get("/api/auth/me");
-          //  setUser(data.user);
+            setUser(data.user);
         }catch (error){
             setUser(null)
         }finally{
@@ -26,12 +26,26 @@ export function AppContentProvider({children}){
     useEffect(()=>{
         checkSession()
 
-    },[checkSession])
+    },[])
+
+    const login = async (credentials) => {
+        const { data } = await api.post("/api/auth/login", credentials);
+        setUser(data.user);
+        return data;
+    }
+
+    const register = async (credentials) => {
+        const { data } = await api.post("/api/auth/register", credentials);
+        setUser(data.user);
+        return data;
+    }
 
     return(
         <AppContext.Provider value={{
             user,
-            loadingUser
+            loadingUser,
+            login,
+            register
         }}>
             {children}
         </AppContext.Provider>
