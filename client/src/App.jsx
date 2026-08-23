@@ -5,7 +5,7 @@ import AuthPage from './pages/AuthPage'
 import Homepages from './pages/Homepages'
 import BuilderPage from'./pages/Builderpage'
 import PreviewPage from './pages/PreviewPage'
-
+import { Navigate } from 'react-router-dom'
 
 const App = () => {
   return(
@@ -23,7 +23,10 @@ const App = () => {
        <Route path='/preview/:id' element={<PreviewPage/>}/>
       </Route>
       
+      {/* Catch-all */}
+      <Route path='*' element={<Navigate to="/" replace />}/>
     </Routes>
+    
   )
 }
 export default App
