@@ -6,9 +6,12 @@ import Homepages from './pages/Homepages'
 import BuilderPage from'./pages/Builderpage'
 import PreviewPage from './pages/PreviewPage'
 import { Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 
 const App = () => {
   return(
+    <>
+    <Toaster></Toaster>
     <Routes>
       {/*Login Routes*/}
       <Route element={<GuestLayout/>}>
@@ -26,6 +29,8 @@ const App = () => {
       {/* Catch-all */}
       <Route path='*' element={<Navigate to="/" replace />}/>
     </Routes>
+    </>
+   
     
   )
 }
