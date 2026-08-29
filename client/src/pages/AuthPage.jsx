@@ -5,9 +5,9 @@ const AuthPage = ({mode}) => {
   const[error,setError] = useState("")
   const [loading , setLoading] = useState(false)
   const [name,setName] = useState("");
-  const [email,setemail] = useState("");
+  const [email,setEmail] = useState("");
   const [password,setPassword] = useState("");
-  const [showPassword,setshowPassword] = useState("");
+  const [showPassword,setShowPassword] = useState(false);
 
   const islogin = mode ==="login";
   return (
@@ -35,7 +35,7 @@ const AuthPage = ({mode}) => {
               Full Name
             </label>
           <input type="text" value ={name} onChange={(e)=>setName(e.target.value)}
-           required className='w-full pl-2 py-2 border-b border-zinc-200focus: outline-none focus: border-zinc-950 text-sm text-zinc-900
+           required className='w-full pl-2 py-2 border-b border-zinc-200 focus:outline-none focus:border-zinc-950 text-sm text-zinc-900
           bg-transparent placeholder-zinc-300 transition-colors'
           placeholder='Naveen Niranjan' /> 
 
@@ -43,10 +43,10 @@ const AuthPage = ({mode}) => {
         )}
          <div>
             <label className="block text-[11px] font-semibold text-zinc-400 uppercase tracking-widest mb-2">
-              Full Name
+              Email Address
             </label>
-          <input type="text" value ={email} onChange={(e)=>setEmail(e.target.value)}
-           required className='w-full pl-2 py-2 border-b border-zinc-200focus: outline-none focus: border-zinc-950 text-sm text-zinc-900
+          <input type="email" value ={email} onChange={(e)=>setEmail(e.target.value)}
+           required className='w-full pl-2 py-2 border-b border-zinc-200 focus:outline-none focus:border-zinc-950 text-sm text-zinc-900
           bg-transparent placeholder-zinc-300 transition-colors'
           placeholder='Jointwith@example.com' /> 
           
@@ -57,12 +57,12 @@ const AuthPage = ({mode}) => {
               Password
             </label>
           <div className='relative'>
-          <input type="showPassword" value ={password} onChange={(e)=>setPassword(e.target.value)} required 
-          className='w-full pl-2 py-2 border-b border-zinc-200 focus: outline-none focus: border-zinc-950 text-sm text-zinc-900
+          <input type={showPassword ? "text" : "password"} value ={password} onChange={(e)=>setPassword(e.target.value)} required 
+          className='w-full pl-2 py-2 border-b border-zinc-200 focus:outline-none focus:border-zinc-950 text-sm text-zinc-900
           bg-transparent placeholder-zinc-300 pr-8'
           placeholder="••••••••" /> 
           {/* buttons for password to tolerate*/}
-          <button type="button" onClick={()=> setshowPassword(!showPassword)}
+          <button type="button" onClick={()=> setShowPassword(!showPassword)}
          className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-300
         hover: text-zinc-600 flex items-center justify-center
           cursor-pointer transition-colors"> 
