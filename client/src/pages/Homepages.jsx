@@ -1,12 +1,19 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useAppContext } from '../context/AppContext'
 import PromptInput from '../components/PromptInput'
 import { homeTags } from '../assets/assets'
+import { useNavigate } from 'react-router-dom'
 
 const Homepages = () => {
 
+const navigate = useNavigate()
+
   const {user, projects, loadingProjects, generatingProject, loadProjects, handleGenerate, handleDelete, logout} = useAppContext()
 
+  useEffect(()=>{
+    loadProjects()
+  },[loadProjects])
+  
   return (
     <div className= "h-screen overflow-y-scroll text-white font-sans bg-[url('/bg-img.png')] bg-cover bg-center bg-no-repeat">
       {/* Nav */}
@@ -58,15 +65,39 @@ const Homepages = () => {
           <div className="animate-marquee gap-3">
             {homeTags.map((tag,i)=>(
               <button key={i}
-              onclick={()=> handleGenerate(tag)}
+              onClick={()=> handleGenerate(tag)}
               disabled={generatingProject}
-              className='px-4 py-1.5 border rounded-full text-sm text-white bg-white/10 border-white/25 hover:bg-white/20 transition cursor-poinb'>
+              className='px-4 py-1.5 border rounded-full text-sm text-white bg-white/10 border-white/25 hover:bg-white/20 transition cursor-pointer'>
                 {tag}
               </button>
             ))}
 
         </div>
-      </div>
+        </div>
+      {/* all projects */}
+      {!loadingProjects && projects.length > 0 && (
+        <div className="mt-12 w-full">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
+          <p> All Projects </p>
+          <span className='text-xs text-zinc-100 font-normal'>
+            {projects.length} {projects.length === 1 ? "project" : "projects"}
+          </span>
+       </div>
+
+       <div className='space-y-2 max-h-[80vh] overflow-y-auto pr-1'>
+        {projects.map((p)=>(
+          <div key={p._id} className='bg-white/5 border border-white/10 rounded-lg px-4 py-3 flex items-center justify-between group hover:border-white/20 hover:bg-white/10 cursor-pointer backdrop-blur-md transition-all'
+          onClick={()=>navigate(`/builder/${p._id}`)}>
+            <div>
+              <p className='text-sm font-medium text-white'>{p.name}</p>
+            </div>
+          </div>
+        ))}
+    </div>
+    </div>
+
+      )}
+    </div>
     </div>
     </div>
   )
