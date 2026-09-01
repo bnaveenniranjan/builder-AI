@@ -3,6 +3,8 @@ import { useAppContext } from '../context/AppContext'
 import PromptInput from '../components/PromptInput'
 import { homeTags } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
+import {ClockIcon, Trash2Icon, ArrowRightIcon} from 'lucide-react'
+import moment from "moment";
 
 const Homepages = () => {
 
@@ -78,8 +80,8 @@ const navigate = useNavigate()
       {!loadingProjects && projects.length > 0 && (
         <div className="mt-12 w-full">
           <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
-          <p> All Projects </p>
-          <span className='text-xs text-zinc-100 font-normal'>
+          <p className='font-[family-name:--font-grotesk] font-semibold tracking-tight'> All Projects </p>
+          <span className='text-xs text-zinc-100 font-normal font-[family-name:--font-grotesk]'>
             {projects.length} {projects.length === 1 ? "project" : "projects"}
           </span>
        </div>
@@ -88,15 +90,34 @@ const navigate = useNavigate()
         {projects.map((p)=>(
           <div key={p._id} className='bg-white/5 border border-white/10 rounded-lg px-4 py-3 flex items-center justify-between group hover:border-white/20 hover:bg-white/10 cursor-pointer backdrop-blur-md transition-all'
           onClick={()=>navigate(`/builder/${p._id}`)}>
-            <div>
-              <p className='text-sm font-medium text-white'>{p.name}</p>
+            <div className='flex-1 min-w-0'>
+              <p className='text-sm font-medium text-white font-[family-name:--font-grotesk]'>{p.name}</p>
+              
+              <div className="flex items-center gap-3 mt-0.5">
+                <span className="text-xs text-zinc-300 flex items-center gap-1 font-[family-name:--font-grotesk]">
+                  <ClockIcon size={10}/>
+                {moment(p.updatedAt || p.createdAt).fromNow()}
+                </span>
+                <span className="text-xs text-white/60 font-medium font-[family-name:--font-grotesk]">v.{p.version}
+                </span>
+              </div>
             </div>
-          </div>
+
+            <div className="flex items-center gap-2">
+              <button onClick={(e)=>{
+                e.stopPropagation();
+                handleDelete(p._id)
+              }}
+              className='p-1.5 rounded-md text-zinc-200 hover:text-red-400 hover:bg-white/10 opacity-100 transition-opacity'>
+                <Trash2Icon size={14}/>
+              </button>
+              <ArrowRightIcon size={14} className="text-zinc-200 group-hover:text-white"/>
+            </div>
+                        </div>
         ))}
     </div>
     </div>
-
-      )}
+    )}
     </div>
     </div>
     </div>

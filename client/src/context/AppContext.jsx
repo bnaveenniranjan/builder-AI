@@ -3,7 +3,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import api from "../api/api";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const AppContext =  createContext(undefined);
@@ -127,24 +127,25 @@ const loadProjects = async () => {
                 }
 
             }
-        //Automatically poll active project status if generating or pending
-        useEffect(()=>{
-            if(!activeProject?._id || !user) return;
 
-            const isOngoing = activeProject.status === "generating" || activeProject.status === "pending" || activeProject.status ==="revising";
+    //Automatically poll active project status if generating or pending
+    useEffect(()=>{
+        if(!activeProject?._id || !user) return;
 
-            if(isOngoing){
-                setChatLoading(true);
-                const interval = setInterval(()=>{
-                    loadProject(activeProject._id,true)
-                },2000);
-                return ()=> clearInterval(interval)
-            }else{
-                setChatLoading(false);
-            }
-            
+        const isOngoing = activeProject.status === "generating" || activeProject.status === "pending" || activeProject.status ==="revising";
+
+        if(isOngoing){
+            setChatLoading(true);
+            const interval = setInterval(()=>{
+                loadProject(activeProject._id,true)
+            },2000);
+            return ()=> clearInterval(interval)
+        }else{
+            setChatLoading(false);
+        }
         
-            },[activeProject?._id,activeProject?.status,user])
+    
+        },[activeProject?._id,activeProject?.status,user])
 
             const handleGenerate = useCallback(
                 async(prompt) => {
@@ -180,7 +181,29 @@ const loadProjects = async () => {
                         
                     },[user]
                 )
-            
+                
+                const handleChat = useCallback(
+                    async(prompt)=>{
+                        if(!activeProject || !user) return;
+                        setChatLoading(true)
+                        try{
+                            const {data} = await api.post(`/api/projects/${activeProject._id}/chat`, 
+                                {prompt});
+                                setActiveProject(data)
+                                if(data.errors && data.errors.length > 0){
+                                    toast.error(`${data.errors.length} revision patch(es) failed`);
+                                }else{
+                                    toast.success(`updated to version ${data.version}`);
+                                }
+
+                                } catch(err){
+                                    console.error("Revision request failed:", err);
+                                    toast.error(err?.response?.data?.error || "Revision request failed");
+                                }finally{
+                                    setChatLoading(false)
+                                }
+                    },[activeProject,user]
+                )
 
         return(
             <AppContext.Provider value={{
@@ -209,7 +232,8 @@ const loadProjects = async () => {
                 handleGenerate,
                 handlegenerate: handleGenerate,
                 handleDelete,
-                handledelete: handleDelete
+                handledelete: handleDelete,
+                handleChat,
 
             }}>
                 {children}
