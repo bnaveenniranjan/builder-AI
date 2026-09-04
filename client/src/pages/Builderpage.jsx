@@ -5,7 +5,7 @@ import Loading from '../components/Loading'
 import BuilderHeader from '../components/BuilderHeader'
 import { FolderTreeIcon, MessageSquareIcon } from 'lucide-react'
 import ChatPanel from '../components/ChatPanel'
-
+import FileExplorer from '../components/FileExplorer'
 const Builderpage = () => {
 // navigating the url from appcontext and useeffect
   const {id} = useParams()
@@ -96,13 +96,26 @@ const Builderpage = () => {
               leftTab === 'chat' ? (
                 <ChatPanel messages={activeProject.messages ?? []} onSend={handleChat} loading={chatLoading} />
               ):(
-                <div>File Explorer</div>
+                <FileExplorer files={activeProject.files ?? {}} activeFile={activeFile} 
+                onFileSelect={(path)=>{
+                  setActiveFile(path);
+                  setShowCode(true);
+              }}
+                />
               )
             }
           </div>
 
         </div>
+      {/* Preview and code AREA */}
+      <div className="flex-1 overflow-hidden">
+        {activeProject.status === "pending" || activeProject.status === "generating" || activeProject.status === "failed" ? (
+          <Loading />
+        ):(
+         <p>PreviewPanel</p> 
+        )}
 
+      </div>
       </div>
       </div>
   )
