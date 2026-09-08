@@ -1,3 +1,4 @@
+// Reusable prompt textarea — supports two visual variants (default solid, glass for hero), auto-focus, Enter-to-submit, and a loading spinner on the send button.
 import React,{useEffect, useRef,useState}  from 'react'
 import {ArrowRightIcon, CloudUploadIcon, Loader2Icon, MicIcon } from 'lucide-react'
 const PromptInput = ({onSubmit ,loading = false, placeholder = "Describe the website you want to build...",large = false,autoFocus = false,variant = "default"}) => {

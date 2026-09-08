@@ -1,11 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import { useAppContext } from '../context/AppContext'
-import { useNavigate, useParams } from 'react-router-dom'
-import Loading from '../components/Loading'
-import BuilderHeader from '../components/BuilderHeader'
-import { FolderTreeIcon, MessageSquareIcon } from 'lucide-react'
-import ChatPanel from '../components/ChatPanel'
-import FileExplorer from '../components/FileExplorer'
+// Builder page — full IDE layout with a left sidebar (Chat / File Explorer tabs) and the live Sandpack preview/code panel on the right.
+import React, { useEffect, useState } from 'react';
+import { useAppContext } from '../context/AppContext';
+import { useNavigate, useParams } from 'react-router-dom';
+import Loading from '../components/Loading';
+import BuilderHeader from '../components/BuilderHeader';
+import { FolderTreeIcon, MessageSquareIcon } from 'lucide-react';
+import ChatPanel from '../components/ChatPanel';
+import FileExplorer from '../components/FileExplorer';
+import PreviewPanel from '../components/PreviewPanel';
+import AgentProgressDashboard from '../components/AgentProgressDashboard';
+import PublishModal from '../components/PublishModal';
+import api from '../api/api';
+import toast from 'react-hot-toast';
+import {exportProjectZip} from '../utils/exportProject';
+
 const Builderpage = () => {
 // navigating the url from appcontext and useeffect
   const {id} = useParams()
@@ -39,13 +47,29 @@ const Builderpage = () => {
           if(!id) return;
           window.open(`/preview/${id}` ,"_blank")
         }
-
+// setting publish button
         const handlePublish = async() =>{
+          if(!id) return;
+          setPublishing(true)
+          try{
+            await api.post(`/api/projects/${id}/publish`);
+            const url = `${window.location.origin}/publish/${id}`;
+            setPublishUrl(url);
+            toast.success("website published successfully!")
+          } catch (error){
+            console.error("Publish failed:",err);
+            toast.error(err?.response?.data?.error  || "Publish failed");
 
+          }finally{
+            setPublishing(false)
+
+          }
 
         }
 
         const handleDownload = () =>{
+          if(!activeProject) return;
+          exportProjectZip(activeProject)
 
         }
         if(loadingActiveProject || !activeProject){
@@ -110,13 +134,16 @@ const Builderpage = () => {
       {/* Preview and code AREA */}
       <div className="flex-1 overflow-hidden">
         {activeProject.status === "pending" || activeProject.status === "generating" || activeProject.status === "failed" ? (
-          <Loading />
+          <AgentProgressDashboard project={activeProject}/>
+       
         ):(
-         <p>PreviewPanel</p> 
+          <PreviewPanel project={activeProject} activeFile={activeFile} showcode={showCode} />
         )}
 
       </div>
       </div>
+      {publishUrl && <PublishModal publishUrl={publishUrl} onClose={()=> setPublishUrl
+        (null)}/>}
       </div>
   )
 }

@@ -1,9 +1,9 @@
-// Scans source files to detect npm dependencies from import statements
+// Sandpack utility — scans all project file contents for import statements and returns a map of npm package names needed as Sandpack custom dependencies.
 export function detectDependencies(files) {
     const deps = {};
     if (!files) return deps;
 
-    const allCode = Object.values(files).join("\n");
+    const allCode = Object.values(files).map(f => typeof f === "string" ? f : f?.content || "").join("\n");
     const filePaths = Object.keys(files);
 
     const isLocalFileOrFolder = (pkgName) => {

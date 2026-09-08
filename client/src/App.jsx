@@ -1,3 +1,4 @@
+// Root router — defines all client-side routes, separating guest-only (login/register) and auth-protected pages.
 import React from 'react'
 import {Route,Routes} from 'react-router-dom'
 import {AuthLayout, GuestLayout} from './pages/Layout'
@@ -7,7 +8,7 @@ import BuilderPage from'./pages/Builderpage'
 import PreviewPage from './pages/PreviewPage'
 import { Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-
+import PublishPage from './pages/Publish';
 const App = () => {
   return(
     <>
@@ -26,6 +27,10 @@ const App = () => {
        <Route path='/preview/:id' element={<PreviewPage/>}/>
       </Route>
       
+
+      {/* public Routes */}
+      <Route path='/publish/:id' element={<PublishPage/>}/>
+
       {/* Catch-all */}
       <Route path='*' element={<Navigate to="/" replace />}/>
     </Routes>

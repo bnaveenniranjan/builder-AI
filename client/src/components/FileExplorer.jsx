@@ -1,3 +1,4 @@
+// File explorer sidebar — converts flat file paths into a nested tree and renders them with colour-coded icons; clicking a file opens it in the code editor.
 import React, { useMemo } from 'react'
 import { FileTextIcon, FolderOpenIcon } from 'lucide-react';
 

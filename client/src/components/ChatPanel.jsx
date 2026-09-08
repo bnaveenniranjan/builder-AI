@@ -1,3 +1,4 @@
+// Chat sidebar panel — displays the AI conversation history with auto-scroll, a "Thinking..." loader, and a prompt input at the bottom.
 import React, { useEffect, useRef } from 'react'
 import { UserIcon, BotMessageSquareIcon, BotIcon } from 'lucide-react'
 import PromptInput from './PromptInput'
