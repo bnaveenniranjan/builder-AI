@@ -1,3 +1,4 @@
+// Left branding panel on the auth page — full-height background image with logo, tagline, and copyright; hidden on mobile.
 import React from 'react'
 
 const LoginLeft = () => {

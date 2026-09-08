@@ -1,3 +1,4 @@
+// Home dashboard — hero prompt to generate new projects, scrolling tag suggestions, and a list of existing user projects.
 import React, { useEffect } from 'react'
 import { useAppContext } from '../context/AppContext'
 import PromptInput from '../components/PromptInput'

@@ -1,3 +1,4 @@
+// Axios API client with a built-in mock adapter — intercepts all requests and serves fake auth/project data from localStorage, so the app runs without a real backend.
 import axios from "axios";
 
 const api = axios.create({

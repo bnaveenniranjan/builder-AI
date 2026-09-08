@@ -1,3 +1,4 @@
+// Top navigation bar for the builder — shows project name, version badge, and action buttons (toggle code/preview, open preview, publish, export, logout).
 import React from 'react'
 import { ArrowLeftIcon, Code2Icon, EyeIcon, ExternalLinkIcon, Loader2Icon, GlobeIcon } from 'lucide-react'
 

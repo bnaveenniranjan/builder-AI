@@ -1,5 +1,4 @@
-
-
+// Full-screen loading spinner — shown while auth state or project data is being fetched.
 import React from 'react'
 import { Loader2Icon } from 'lucide-react'
 

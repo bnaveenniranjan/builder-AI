@@ -1,3 +1,4 @@
+// Login & Register page — renders a split-screen form (branding panel + auth form) controlled by the `mode` prop.
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import LoginLeft from '../components/loginLeft';

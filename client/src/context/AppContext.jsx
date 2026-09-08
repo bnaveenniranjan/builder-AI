@@ -1,10 +1,9 @@
-// this page will redirect the user to login pages ,
-//  if new user push sign up pages
-
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+// Global state context — provides auth (login/register/logout), project CRUD, chat, and live file-save actions to the entire app.
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import debounce from "lodash.debounce";
 
 const AppContext =  createContext(undefined);
 
@@ -204,6 +203,31 @@ const loadProjects = async () => {
                                 }
                     },[activeProject,user]
                 )
+                // save project files to DB with debounce to avoid excessive API calls
+                const debouncedSave = useMemo(
+                    () => debounce(async(files,id) =>{
+                        try{
+                            await api.put(`/api/projects/${id}/files`,{files})
+                        }catch(err){
+                            console.error("failed to auto-save files:",err);
+                            toast.error("failed to save code modifications");
+                        }
+                    } ,1000),[],
+                )
+                // to call the debounced save function when files change
+                useEffect(()=>{
+                    debouncedSave.cancel();
+                },[debouncedSave])
+              
+                const updateProjectFiles = useCallback(
+                    async (files) => {
+                        if(!activeProject || !user) return;
+                        debouncedSave(files,activeProject._id)
+                    },[activeProject,user,debouncedSave]
+                )
+                
+
+                
 
         return(
             <AppContext.Provider value={{
@@ -234,6 +258,8 @@ const loadProjects = async () => {
                 handleDelete,
                 handledelete: handleDelete,
                 handleChat,
+                logout,
+                updateProjectFiles
 
             }}>
                 {children}
