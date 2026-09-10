@@ -1,18 +1,9 @@
-// Live preview panel — wraps SandpackProvider to render project files in-browser; handles file watching, dependency detection, and bundler timeout with a custom retry overlay.
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
-import {
-    SandpackCodeEditor,
-    SandpackLayout,
-    SandpackPreview,
-    SandpackProvider,
-    useSandpack,
-} from '@codesandbox/sandpack-react'
-import { detectDependencies } from '../utils/sandpackUtils';
-import { useAppContext } from '../context/AppContext';
-import { RefreshCw, WifiOff } from 'lucide-react';
+import React from 'react'
 
-// Custom overlay shown instead of Sandpack's built-in timeout screen
-function NetworkErrorOverlay({ onRetry }) {
+const FullPagePreview = ({files}) => {
+
+     const [showErrorOverlay,setShowErrorOverlay] = useState(true);
+    function NetworkErrorOverlay({ onRetry }) {
     return (
         <div
             style={{ flex: 1, minWidth: 0 }}
@@ -128,7 +119,6 @@ function SandpackInternals({ onliveFilesChanges, showcode, showErrorOverlay, onR
 }
 
 const PreviewPanel = ({ project, activeFile, showcode }) => {
-    const [showErrorOverlay,setShowErrorOverlay] = useState(true);
     const [sandpackKey, setSandpackKey] = useState(0);
     const [liveFiles, setLivefiles] = useState(project.files);
     const [prevProjectKey, setPrevprojectkey] = useState(`${project._id}-${project.version}`);
@@ -165,51 +155,32 @@ const PreviewPanel = ({ project, activeFile, showcode }) => {
     }, [liveFiles, activeFile]);
 
     const dependencies = useMemo(() => detectDependencies(liveFiles), [liveFiles]);
+   return (
+          <div className="h-full w-full">
+              <SandpackProvider
+                  key={`${project._id}-${sandpackKey}`}
+                  template="react"
+                  files={sandpackFiles}
+                  customSetup={{ dependencies }}
+                  options={{
+                      externalResources: [
+                          'https://cdn.tailwindcss.com',
+                          'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+                      ],
+                     
+                      logLevel: 0,
+                      autorun: true,
+                  }}
+                  className="h-full w-full"
+                 
+                      onliveFilesChanges={handleLiveFilesChange}
+                      showcode={showcode}
+                      showErrorOverlay={true}
+                      onRetry={handleRetry}
+                  />
+              
+          </div>
+   )
+}
 
-    return (
-        <div className="h-full w-full">
-            <SandpackProvider
-                key={`${project._id}-${sandpackKey}`}
-                template="react"
-                files={sandpackFiles}
-                customSetup={{ dependencies }}
-                options={{
-                    externalResources: [
-                        'https://cdn.tailwindcss.com',
-                        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-                    ],
-                    classes: {
-                        'sp-wrapper': 'sp-wrapper',
-                        'sp-layout': 'sp-layout',
-                        'sp-preview': 'sp-preview',
-                    },
-                    logLevel: 0,
-                    autorun: true,
-                }}
-                theme={{
-                    colors: {
-                        surface1: '#ffffff', surface2: '#f9fafb', surface3: '#f3f4f6',
-                        clickable: '#1f2937', base: '#1f2937', disabled: '#9ca3af',
-                        hover: '#1f2937', accent: '#3b82f6',
-                        error: '#ef4444', errorSurface: '#fef2f2',
-                    },
-                    font: {
-                        body: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif',
-                        mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace',
-                        size: '14px',
-                        lineHeight: '1.6',
-                    },
-                }}
-            >
-                <SandpackInternals
-                    onliveFilesChanges={handleLiveFilesChange}
-                    showcode={showcode}
-                    showErrorOverlay={true}
-                    onRetry={handleRetry}
-                />
-            </SandpackProvider>
-        </div>
-    );
-};
-
-export default PreviewPanel;
+export default FullPagePreview

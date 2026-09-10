@@ -216,7 +216,7 @@ const loadProjects = async () => {
                 )
                 // to call the debounced save function when files change
                 useEffect(()=>{
-                    debouncedSave.cancel();
+                    debouncedSave.flush();
                 },[debouncedSave])
               
                 const updateProjectFiles = useCallback(
@@ -259,7 +259,8 @@ const loadProjects = async () => {
                 handledelete: handleDelete,
                 handleChat,
                 logout,
-                updateProjectFiles
+                updateProjectFiles,
+                handleChat
 
             }}>
                 {children}
