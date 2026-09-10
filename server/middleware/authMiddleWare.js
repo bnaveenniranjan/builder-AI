@@ -4,7 +4,7 @@ export function authMiddleware(req,res,next){
     const token = req.cookies.token;
 
     if(!token){
-        res.status(401).json({ error:"Access denied . No  session token providesd."});
+     return   res.status(401).json({ error:"Access denied . No  session token providesd."});
     }
     try{
         const decoded = jwt.verify(token,process.env.JWT_SECRET || 'fallback_secret');
