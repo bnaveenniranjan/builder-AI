@@ -1,22 +1,45 @@
 import { Project } from "../models/Project.js";
+import { generateProject } from "../services/ai.js";
 
 // ─── Private Helper ────────────────────────────────────────────────────────────
 
+// BackGround worker to progressive generate files and update database in real time.
 /**
- * Background worker — progressive AI file generation.
- * Runs fire-and-forget after createProject responds.
  * @param {string} projectId
  * @param {string} prompt
  */
-async function runBackgroundGeneration(projectId, prompt) {
+async function runBackground(projectId, prompt) {
     try {
+        console.log(`[Background AI] Starting generation for project ${projectId}`);
+
         await Project.findByIdAndUpdate(projectId, { status: "generating" });
 
-        // TODO: integrate AI generation pipeline here
-        // e.g. call OpenAI / Gemini, stream files back, update project.files
+        const result = await generateProject(prompt, {
+            onPlan: async (plan) => {
+                console.log(
+                    `[Background AI] Plan created for project ${projectId}. Planned ${plan.files.length} files.`
+                );
+            },
+            onFileStart: async (filePath) => {
+                console.log(`[Background AI] Generating file: ${filePath}`);
+            },
+            onFileComplete: async (filePath, code) => {
+                await Project.findByIdAndUpdate(projectId, {
+                    $set: { [`files.${filePath.replace(/\//g, "__")}`]: code },
+                });
+                console.log(`[Background AI] Saved file: ${filePath}`);
+            },
+        });
 
-        await Project.findByIdAndUpdate(projectId, { status: "completed" });
+        await Project.findByIdAndUpdate(projectId, {
+            status: "completed",
+            files: result.files,
+            description: result.description,
+        });
+
+        console.log(`[Background AI] Generation complete for project ${projectId}`);
     } catch (err) {
+        console.error(`[Background AI] Generation failed for project ${projectId}:`, err.message);
         await Project.findByIdAndUpdate(projectId, {
             status: "failed",
             error: err.message,
@@ -24,11 +47,8 @@ async function runBackgroundGeneration(projectId, prompt) {
     }
 }
 
-// ─── POST /api/projects ────────────────────────────────────────────────────────
-/**
- * Create a new project from an AI prompt.
- * Body: { name?, description?, prompt }
- */
+// POST /api/projects
+// Create a new project from an AI prompt
 export async function createProject(req, res) {
     const { name, description, prompt } = req.body;
 
@@ -44,16 +64,13 @@ export async function createProject(req, res) {
     });
 
     // Kick off generation without blocking the response
-    runBackgroundGeneration(project._id.toString(), prompt);
+    runBackground(project._id.toString(), prompt);
 
     return res.status(201).json({ project });
 }
 
-// ─── GET /api/projects ─────────────────────────────────────────────────────────
-/**
- * List all projects owned by the authenticated user.
- * Returns summary fields only — no file contents.
- */
+// GET /api/projects
+// List all projects owned by the user (summary only, no file contents).
 export async function listProjects(req, res) {
     const projects = await Project.find({ owner: req.user.userId })
         .select("-files -messages")
@@ -62,10 +79,8 @@ export async function listProjects(req, res) {
     return res.json({ projects });
 }
 
-// ─── GET /api/projects/:id ─────────────────────────────────────────────────────
-/**
- * Get full project details (ownership-gated).
- */
+// GET /api/projects/:id
+// GET full project details.
 export async function getProject(req, res) {
     const project = await Project.findById(req.params.id);
 
@@ -80,11 +95,8 @@ export async function getProject(req, res) {
     return res.json({ project });
 }
 
-// ─── PUT /api/projects/:id/files ───────────────────────────────────────────────
-/**
- * Update project files (manual edits from the editor).
- * Body: { files: { "path/to/file.js": "...content..." } }
- */
+// PUT /api/projects/:id/files
+// Update project files (manual edits).
 export async function updateProjectFiles(req, res) {
     const { files } = req.body;
 
@@ -109,10 +121,8 @@ export async function updateProjectFiles(req, res) {
     return res.json({ project });
 }
 
-// ─── DELETE /api/projects/:id ──────────────────────────────────────────────────
-/**
- * Delete a project (ownership-gated).
- */
+// DELETE /api/projects/:id
+// Delete a project.
 export async function deleteProject(req, res) {
     const project = await Project.findById(req.params.id);
 
@@ -129,11 +139,8 @@ export async function deleteProject(req, res) {
     return res.json({ success: true, message: "Project deleted" });
 }
 
-// ─── POST /api/projects/:id/publish ───────────────────────────────────────────
-/**
- * Toggle the published flag on a project.
- * Body: { published: true | false }
- */
+//POST/API/PROJECTS/:ID/PUBLISH
+//UPDATE PROJECT FILES (publicly published).
 export async function publishProject(req, res) {
     const { published } = req.body;
 

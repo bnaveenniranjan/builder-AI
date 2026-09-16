@@ -8,7 +8,7 @@ import {
     deleteProject,
     publishProject,
 } from "../controllers/projectController.js";
-
+import { chat } from "../controllers/chatController.js";
 const projectRouter = Router();
 
 // All project routes require authentication
@@ -21,4 +21,6 @@ projectRouter.put("/:id/files",           updateProjectFiles);
 projectRouter.delete("/:id",              deleteProject);
 projectRouter.post("/:id/publish",        publishProject);
 
+//chat
+projectRouter.post("/:id/chat",chat)
 export default projectRouter;
